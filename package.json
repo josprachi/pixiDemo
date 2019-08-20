@@ -1,0 +1,30 @@
+{
+  "name": "pixidemo",
+  "version": "0.0.1",
+  "description": "this is a sample project for usage of pixijs + typescript + webpack using npm ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josprachi/pixiDemo.git"
+  },
+  "keywords": [
+    "pixijs",
+    "typescript",
+    "webpack"
+  ],
+  "author": "Prachi Joshi (josprachi)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/josprachi/pixiDemo/issues"
+  },
+  "homepage": "https://github.com/josprachi/pixiDemo#readme",
+  "devDependencies": {
+    "ts-loader": "^6.0.4",
+    "typescript": "^3.5.3",
+    "webpack": "^4.39.2",
+    "webpack-dev-server": "^3.8.0"
+  }
+}
