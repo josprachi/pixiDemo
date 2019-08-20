@@ -4,7 +4,9 @@
   "description": "this is a sample project for usage of pixijs + typescript + webpack using npm ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -21,10 +23,20 @@
     "url": "https://github.com/josprachi/pixiDemo/issues"
   },
   "homepage": "https://github.com/josprachi/pixiDemo#readme",
+  "dependencies": {
+    "pixi-fps": "^2.0.1",
+    "pixi.js": "^5.1.1"
+  },
   "devDependencies": {
+    "@types/node": "^12.7.2",
+    "@types/pixi.js": "^4.8.8",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^5.0.4",
+    "html-webpack-plugin": "^3.2.0",
     "ts-loader": "^6.0.4",
     "typescript": "^3.5.3",
     "webpack": "^4.39.2",
+    "webpack-cli": "^3.3.7",
     "webpack-dev-server": "^3.8.0"
   }
 }
