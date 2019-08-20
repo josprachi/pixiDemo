@@ -14,12 +14,13 @@ class Game {
       height: 600,
       backgroundColor: 0x1099bb // light blue
     });
-
+    this.app.renderer.resize(window.innerWidth, window.innerHeight);
     // create view in DOM
     document.body.appendChild(this.app.view);
 
+
     // preload needed assets
-  
+    loader.add('/res/Tiles.json');
     // then launch app
    loader.load(this.setup.bind(this));
   
@@ -28,6 +29,17 @@ class Game {
   setup(): void {
     // append hero
    console.log("hello world"); 
+   /*let cat = new PIXI.Sprite(loader.resources["/res/card1.png"].texture);
+  
+  //Add the cat to the stage
+  this.app.stage.addChild(cat);
+*/
+/*   let sprs = PIXI.loader.resources["res/Tiles.json"].textures;
+   let sprite = new Sprite(sprs["card1.png"]);
+   this.app.stage.addChild(sprite);
+    sprite.y = 300;
+    sprite.x = 200;
+*/
   /*  const hero = new Character(loader.resources['samir'].texture);
     const heroSprite = hero.sprite;
     this.app.stage.addChild(heroSprite);
