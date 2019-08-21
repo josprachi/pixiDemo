@@ -7,6 +7,7 @@
     "target": "es5"
   },
   "filesGlob": [
-    "./src/*.ts"
+    "./src/*.ts",
+    "./src/*.png"
   ]
 }

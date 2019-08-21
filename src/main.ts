@@ -1,12 +1,25 @@
 import * as PIXI from 'pixi.js';
-import { Application, loader } from 'pixi.js';
+import { Application} from 'pixi.js';
 import PixiFps from 'pixi-fps';
 
-//import { Character } from '@app/character.class';
+const loader = new PIXI.Loader();
+
+const cardFrames = [ 
+    "/res/card1.png",
+    "/res/card2.png",
+    "/res/card3.png",
+    "/res/card4.png",
+    "/res/card5.png",
+    "/res/card6.png",
+];
+
+
 class Game {
   private app: Application;
+  
+  private cards:PIXI.Sprite[];
   constructor() {
-  const loader = new PIXI.Loader();
+ 
 
     // instantiate app
     this.app = new Application({
@@ -15,54 +28,61 @@ class Game {
       backgroundColor: 0x1099bb // light blue
     });
     this.app.renderer.resize(window.innerWidth, window.innerHeight);
+ 
     // create view in DOM
+ 
     document.body.appendChild(this.app.view);
 
 
     // preload needed assets
-    loader.add('/res/Tiles.json');
-    // then launch app
+  
+   loader.load(this.loadAssets.bind(this)); 
+ 
+ //launch the app
    loader.load(this.setup.bind(this));
   
   }
 
+  loadAssets():void
+  {
+   loader.add(cardFrames);
+  }
+
   setup(): void {
-    // append hero
-   console.log("hello world"); 
-   /*let cat = new PIXI.Sprite(loader.resources["/res/card1.png"].texture);
+
+  this.cards=[];
+    
+  for(var i=0;i<144;i++)
+  {
+  	var _rand=Math.floor((Math.random() * 6));
+    
+    let cat = new PIXI.Sprite(loader.resources[cardFrames[_rand]].texture);
   
-  //Add the cat to the stage
-  this.app.stage.addChild(cat);
-*/
-/*   let sprs = PIXI.loader.resources["res/Tiles.json"].textures;
-   let sprite = new Sprite(sprs["card1.png"]);
-   this.app.stage.addChild(sprite);
-    sprite.y = 300;
-    sprite.x = 200;
-*/
-  /*  const hero = new Character(loader.resources['samir'].texture);
-    const heroSprite = hero.sprite;
-    this.app.stage.addChild(heroSprite);
-    heroSprite.y = 300;
+ 
+    this.app.stage.addChild(cat);
 
-    //  animate hero
-    let moveLeft = true;
-    this.app.ticker.add(() => {
-      const speed = 2;
-      if (heroSprite.x < this.app.view.width && moveLeft) {
-        heroSprite.x += speed;
-      } else {
-        heroSprite.x -= speed;
-        moveLeft = heroSprite.x <= 0;
-      }
-    });
-    */
-  const fpsCounter = new PixiFps();
-  console.log("here");
-  this.app.stage.addChild(fpsCounter);
-   fpsCounter.y = 0;
-   fpsCounter.x=0;
-
+    if(i<120)
+    {
+	    cat.y = 300;
+	    cat.x = 100;
+    }
+    else
+    {
+	    cat.y = 300-((i+5)-120);
+	    cat.x = 100+((i+5)-120);
+    }
+ 
+    this.cards.push(cat);
+ 
+  }  
+  console.log(this.cards.length); 
+  
+  
+    const fpsCounter = new PixiFps();
+    console.log("here");
+    this.app.stage.addChild(fpsCounter);
+    fpsCounter.y = 0;
+    fpsCounter.x=0;
   }
 
 
@@ -70,18 +90,3 @@ class Game {
 
 new Game();
 
-
-/*import * as PIXI from "pixi.js";
-
-//Create the renderer
-var renderer = PIXI.autoDetectRenderer(256, 256);
-
-//Add the canvas to the HTML document
-document.body.appendChild(renderer.view);
-
-//Create a container object called the `stage`
-var stage = new PIXI.Container();
-
-//Tell the `renderer` to `render` the `stage`
-renderer.render(stage);
-*/
