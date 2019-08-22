@@ -25,6 +25,7 @@
   "homepage": "https://github.com/josprachi/pixiDemo#readme",
   "dependencies": {
     "pixi-fps": "^2.0.1",
+    "pixi-particles": "^4.1.2",
     "pixi.js": "^5.1.1"
   },
   "devDependencies": {

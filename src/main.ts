@@ -1,10 +1,9 @@
 import * as PIXI from 'pixi.js';
 import { Application} from 'pixi.js';
 import PixiFps from 'pixi-fps';
+import * as particles from 'pixi-particles';
 
 const loader = new PIXI.Loader();
-
-
 const cardFrames = [ 
     "/res/card1.png",
     "/res/card2.png",
@@ -31,7 +30,7 @@ const prices = [ 10,23,54,1,44];
 const MAINMENU=0;
 const CARDMENU=1;
 const BANNERMENU=2;
-const FIREMENU=3;
+//const FIREMENU=3;
 
 class Game {
   private app: Application;
@@ -65,9 +64,7 @@ class Game {
 
   private cardTicker:PIXI.Ticker;
   private comboTicker:PIXI.Ticker;
-  private animationTicker:PIXI.Ticker;
-  
-  
+  //private animationTicker:PIXI.Ticker;
 
   constructor() {
     // instantiate app
@@ -76,34 +73,34 @@ class Game {
       height: 600,
       backgroundColor: 0x1099bb // light blue
     });
+    
+    //this.app.view.style.position = "absolute";
+    this.app.renderer.autoResize = true;
     this.app.renderer.resize(window.innerWidth, window.innerHeight);
+   // this.app.renderer.resize(window.innerWidth, window.innerHeight
     // create view in DOM
  
     document.body.appendChild(this.app.view);
-
     this.menuScene = new PIXI.Container();
     this.app.stage.addChild(this.menuScene);
     
-    this.fireScene = new PIXI.Container();
+    this.fireScene = new PIXI.ParticleContainer();//Container();
     this.app.stage.addChild(this.fireScene);
-
-
     this.cardStack = new PIXI.Container();
     this.cardStack.sortableChildren=true;
     this.app.stage.addChild(this.cardStack);
-    //this.cardStack.visible=false;
-    
-
     this.textCombo = new PIXI.Container();
     this.app.stage.addChild(this.textCombo);
+
+    
 
      this.currentTime=0.0;
      this.cardCounter=0;
 
-     this.stack1Pos_x=200;
-     this.stack1Pos_y=150;
-     this.stack2Pos_x=700;
-     this.stack2Pos_y=300;
+     this.stack1Pos_x=window.innerWidth*0.1;
+     this.stack1Pos_y=window.innerHeight*0.25;
+     this.stack2Pos_x=window.innerWidth*0.5;
+     this.stack2Pos_y=window.innerHeight*0.25;
 
 
      this.cardTicker=new PIXI.Ticker();
@@ -166,6 +163,7 @@ class Game {
 
     this.CardsBtn.on('pointerdown',this.showCardsStack,this);
     this.TextComboBtn.on('pointerdown',this.showTextCombo,this);
+    this.FireButton.on('pointerdown',this.showParticles,this);
     this.BackButton.on('pointerdown',this.showMainMenu,this);
 
 
@@ -232,7 +230,131 @@ showTextCombo():void
   
 //console.log("onlick");
 }
-
+showParticles():void
+{
+  this.hideAll();
+  this.currentScreen=BANNERMENU;
+  this.fireScene.visible=true;   
+  this.menuScene.visible=true;
+  this.BackButton.visible=true;
+  this.setupFireParticle();
+}
+setupFireParticle():void
+{
+  var emitter = new particles.Emitter(this.fireScene,coinTexture,
+    
+    // Emitter configuration, edit this to change the look
+    // of the emitter
+    {
+      alpha: {
+        list: [
+          {
+            value: 0.8,
+            time: 0
+          },
+          {
+            value: 0.1,
+            time: 1
+          }
+        ],
+        isStepped: false
+      },
+      scale: {
+        list: [
+          {
+            value: 1,
+            time: 0
+          },
+          {
+            value: 0.3,
+            time: 1
+          }
+        ],
+        isStepped: false
+      },
+      color: {
+        list: [
+          {
+            value: "fb1010",
+            time: 0
+          },
+          {
+            value: "f5b830",
+            time: 1
+          }
+        ],
+        isStepped: false
+      },
+      speed: {
+        list: [
+          {
+            value: 200,
+            time: 0
+          },
+          {
+            value: 100,
+            time: 1
+          }
+        ],
+        isStepped: false
+      },
+      startRotation: {
+        min: 0,
+        max: 360
+      },
+      rotationSpeed: {
+        min: 0,
+        max: 0
+      },
+      lifetime: {
+        min: 0.5,
+        max: 0.5
+      },
+      frequency: 0.008,
+      spawnChance: 1,
+      particlesPerWave: 1,
+      emitterLifetime: 0.31,
+      maxParticles: 1000,
+      pos: {
+        x: 0,
+        y: 0
+      },
+      addAtBack: false,
+      spawnType: "circle",
+      spawnCircle: {
+        x: 0,
+        y: 0,
+        r: 10
+      }
+    }
+  );
+  
+  // Calculate the current time
+  var elapsed = Date.now();
+      
+  // Update function every frame
+  var update = function(){
+        
+    // Update the next frame
+    requestAnimationFrame(update);
+  
+    var now = Date.now();
+    
+    // The emitter requires the elapsed
+    // number of seconds since the last update
+    emitter.update((now - elapsed) * 0.001);
+    elapsed = now;
+    
+    // Should re-render the PIXI Stage
+    // renderer.render(stage);
+  };
+  
+  // Start emitting
+  emitter.emit = true;
+  
+  // Start the update
+  update();
+}
 
   //Cards module
 setupCardStack():void
@@ -297,60 +419,68 @@ resetCardsMenu():void
   displayMessage(delta:number):void
   { this.currentTime+=delta; 
     if(this.currentTime>240)
-      { console.log("displaymesage"+this.currentTime);
+      { 
         this.resetBanner();
          this.banner=[];  
         for(var i=0;i<3;i++)
         {
           var _rand=Math.floor((Math.random() * 4)); 
-          var _randFontSize=Math.floor((Math.random()*30));  
+          var _randFontSize=Math.floor((Math.random()*30)+10);  
+          var style = new PIXI.TextStyle({fontSize: _randFontSize, });
           
           if(_rand==0)
           {
-            var _randText=Math.floor((Math.random() * emotionStr.length));            
-            var emoText=  new PIXI.Text(emotionStr[_randText]);           
+            var _randText=Math.floor((Math.random() * emotionStr.length)); 
+            var emoText=  new PIXI.Text(emotionStr[_randText],style);           
+            //emoText.pivot.set(0.5,0);
             this.banner.push(emoText);
-      
           } 
           if(_rand==1)
           {
             var _randText=Math.floor((Math.random() * prices.length));     
-            var emoText=  new PIXI.Text(prices[_randText].toString());         
+            var emoText=  new PIXI.Text(prices[_randText].toString(),style); 
+           // emoText.pivot.set(0.5,0);        
             this.banner.push(emoText);
           } 
           if(_rand==2)
-          {
-          
-            var emospr=  new PIXI.Sprite(loader.resources[coinTexture].texture);           
+          {          
+            var emospr=  new PIXI.Sprite(loader.resources[coinTexture].texture);
+            //emospr.pivot.set(0,0);           
             this.banner.push(emospr);
           } 
           if(_rand==3)
           {
             var _randText=Math.floor((Math.random() * emotionTexture.length));     
             var emospr= new PIXI.Sprite(loader.resources[emotionTexture[_randText]].texture);
+          //  emospr.pivot.set(0,0);
             this.banner.push(emospr);
           } 
          } 
         
          for(var i=0;i<this.banner.length;i++)
-         { console.log(this.banner.length);
+         {
            this.textCombo.addChild(this.banner[i]);
-           this.banner[i].x=window.innerWidth*0.1*i;
-           this.banner[i].y=300;//window.innerHeight*0.25;
+           if(i>0)
+           {
+             this.banner[i].x=(this.banner[i-1].x+(this.banner[i].width*1.5));
+           }
+           else
+           {
+             this.banner[i].x=window.innerWidth*0.1;
+           }
+           this.banner[i].y=window.innerHeight*0.5;
          }
          this.currentTime=0.0;  
 
      }
   }
   resetBanner():void
-  {console.log(this.textCombo.children.length);
+  {
     if(this.textCombo.children.length>0)
     {
       this.textCombo.removeChildren(0,this.textCombo.children.length);
-    }
-    
+    }    
   }
-
 }
 
 new Game();

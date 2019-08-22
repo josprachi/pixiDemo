@@ -4,7 +4,15 @@
     "noImplicitAny": true,
     "outDir": "./dist/",
     "sourceMap": true,
-    "target": "es5"
+    "target": "es5",
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "baseUrl": "./src/",
+    "paths": {
+      "@app/*": ["src/*"],
+      "@assets/*": ["res/*"]
+    }
   },
   "filesGlob": [
     "./src/*.ts",
