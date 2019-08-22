@@ -28,6 +28,10 @@ const emotionTexture = [
 ];
 const coinTexture="/res/coin.png";
 const prices = [ 10,23,54,1,44];
+const MAINMENU=0;
+const CARDMENU=1;
+const BANNERMENU=2;
+const FIREMENU=3;
 
 class Game {
   private app: Application;
@@ -57,6 +61,7 @@ class Game {
   private cardStack:PIXI.Container;
   private textCombo:PIXI.Container;
   private fireScene:PIXI.Container;
+  private currentScreen:number;
   
   
 
@@ -107,6 +112,7 @@ class Game {
  //launch the app
    //loader.load(this.setupCardStack.bind(this));
    //loader.load(this.setupTextCombo.bind(this));
+   this.currentScreen=MAINMENU;
    loader.load(this.setup.bind(this));  
   }
 
@@ -121,29 +127,50 @@ class Game {
     this.app.stage.addChild(fpsCounter);
     fpsCounter.y = 0;
     fpsCounter.x=0;
+
     
-    this.cardStack.visible=false;
+    
+    this.menuScene.visible=true;
+    //this.cardStack.visible=false;
     this.CardsBtn = new PIXI.Text('show Cards');
     this.CardsBtn.x = window.innerWidth*0.25;
     this.CardsBtn.y = window.innerHeight*0.45;
     this.CardsBtn.interactive = true;
     this.CardsBtn.buttonMode = true;
 
-    this.textCombo.visible=false;
+    //this.textCombo.visible=false;
     this.TextComboBtn = new PIXI.Text('show Text Combo');
     this.TextComboBtn.x = window.innerWidth*0.25;
-    this.TextComboBtn.y = window.innerHeight*0.65;
+    this.TextComboBtn.y = window.innerHeight*0.55;
     this.TextComboBtn.interactive = true;
     this.TextComboBtn.buttonMode = true;
+
+    this.FireButton = new PIXI.Text('show Fire Particle');   
+    this.FireButton.x = window.innerWidth*0.25;
+    this.FireButton.y = window.innerHeight*0.65;
+    this.FireButton.interactive = true;
+    this.FireButton.buttonMode = true;
+
+
+    this.BackButton = new PIXI.Text('Back to main menu');
+    this.BackButton.x = window.innerWidth*0.01;
+    this.BackButton.y = window.innerHeight*0.1;
+    this.BackButton.interactive = true;
+    this.BackButton.buttonMode = true;
 
 
 
     this.CardsBtn.on('pointerdown',this.showCardsStack,this);
     this.TextComboBtn.on('pointerdown',this.showTextCombo,this);
+    this.BackButton.on('pointerdown',this.showMainMenu,this);
 
 
     this.menuScene.addChild(this.CardsBtn);
     this.menuScene.addChild(this.TextComboBtn);
+    this.menuScene.addChild(this.FireButton);
+    this.menuScene.addChild(this.BackButton); 
+    this.hideAll();
+    this.showMainMenu();
 
   }
 
@@ -152,17 +179,53 @@ hideAll():void
   this.cardStack.visible=false;
   this.textCombo.visible=false;
   this.fireScene.visible=false;
+  this.menuScene.visible=false;
+  this.CardsBtn.visible=false;
+  this.TextComboBtn.visible=false;
+  this.FireButton.visible=false;
 }
+showMainMenu():void
+{
+  this.hideAll();
+  if(this.currentScreen == BANNERMENU)
+  {
+this.resetBanner();
+  }
+  else if(this.currentScreen == CARDMENU)
+  {
+this.resetCardsMenu();
+  }
+ // this.currentScreen=MAINMENU;
+  this.menuScene.visible=true;
+  this.BackButton.visible=false;
+  this.CardsBtn.visible=true;
+  this.TextComboBtn.visible=true;
+  this.FireButton.visible=true;
+  this.currentTime=0.0;
+}
+
 showCardsStack():void
 {
+  this.hideAll();
+  this.currentScreen=CARDMENU;
   this.cardStack.visible=true;
+  this.menuScene.visible=true;
+  this.BackButton.visible=true;
   this.setupCardStack();
-console.log("onlick");
+  //console.log("onlick");
 }
 showTextCombo():void
-{
-console.log("onlick");
+{ 
+  this.hideAll();
+  this.currentScreen=BANNERMENU;
+  this.cardStack.visible=true;
+  this.menuScene.visible=true;
+  this.BackButton.visible=true;
+  this.setupTextCombo();
+//console.log("onlick");
 }
+
+
   //Cards module
 setupCardStack():void
 {
@@ -197,11 +260,15 @@ setupCardStack():void
         this.currentTime=0.0;
      } 
     }
-    else{
+   /* else{
       this.app.ticker.remove(this.releaseCard);
     } 
+    */
   }
-
+resetCardsMenu():void
+{
+  this.app.ticker.remove(this.releaseCard);
+}
 
   //text combo module
   setupTextCombo():void
@@ -212,8 +279,8 @@ setupCardStack():void
   }
 
   displayMessage(delta:number):void
-  { //this.currentTime+=delta; 
-    if(this.currentTime>59)
+  { this.currentTime+=delta; 
+    if(this.currentTime>120)
       { console.log("here");
       var basicText = new PIXI.Text('Basic text in pixi');
       basicText.x = window.innerWidth*0.5;
@@ -221,13 +288,14 @@ setupCardStack():void
       this.textCombo.addChild(basicText);
       //basicText.text="here";
       this.banner.push(basicText);
-        console.log(this.banner.length);
-        //this.currentTime=0.0;
+        //console.log(this.banner.length);
+        this.currentTime=0.0;
      }
   }
   resetBanner():void
   {
-    console.log(this.banner.length);
+    this.app.ticker.remove(this.displayMessage);
+    //console.log(this.banner.length);
   }
 
 }
