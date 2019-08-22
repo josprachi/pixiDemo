@@ -62,12 +62,14 @@ class Game {
   private textCombo:PIXI.Container;
   private fireScene:PIXI.Container;
   private currentScreen:number;
+
+  private cardTicker:PIXI.Ticker;
+  private comboTicker:PIXI.Ticker;
+  private animationTicker:PIXI.Ticker;
   
   
 
   constructor() {
- 
-
     // instantiate app
     this.app = new Application({
       width: 800,
@@ -75,9 +77,6 @@ class Game {
       backgroundColor: 0x1099bb // light blue
     });
     this.app.renderer.resize(window.innerWidth, window.innerHeight);
-
-
- 
     // create view in DOM
  
     document.body.appendChild(this.app.view);
@@ -105,13 +104,16 @@ class Game {
      this.stack1Pos_y=150;
      this.stack2Pos_x=700;
      this.stack2Pos_y=300;
+
+
+     this.cardTicker=new PIXI.Ticker();
+     this.comboTicker=new PIXI.Ticker();
     // preload needed assets
   
    loader.load(this.loadAssets.bind(this)); 
  
  //launch the app
-   //loader.load(this.setupCardStack.bind(this));
-   //loader.load(this.setupTextCombo.bind(this));
+
    this.currentScreen=MAINMENU;
    loader.load(this.setup.bind(this));  
   }
@@ -119,6 +121,8 @@ class Game {
   loadAssets():void
   {
    loader.add(cardFrames);
+   loader.add(emotionTexture);
+   loader.add(coinTexture);
   }
 
   setup(): void {  
@@ -188,19 +192,22 @@ showMainMenu():void
 {
   this.hideAll();
   if(this.currentScreen == BANNERMENU)
-  {
-this.resetBanner();
+  {  
+    this.resetBanner();
+    this.comboTicker.stop(); 
   }
   else if(this.currentScreen == CARDMENU)
   {
-this.resetCardsMenu();
+    this.resetCardsMenu();
   }
- // this.currentScreen=MAINMENU;
+ //
+// this.app.ticker.start();
   this.menuScene.visible=true;
   this.BackButton.visible=false;
   this.CardsBtn.visible=true;
   this.TextComboBtn.visible=true;
   this.FireButton.visible=true;
+  this.currentScreen=MAINMENU;
   this.currentTime=0.0;
 }
 
@@ -218,10 +225,11 @@ showTextCombo():void
 { 
   this.hideAll();
   this.currentScreen=BANNERMENU;
-  this.cardStack.visible=true;
+  this.textCombo.visible=true;   
   this.menuScene.visible=true;
   this.BackButton.visible=true;
   this.setupTextCombo();
+  
 //console.log("onlick");
 }
 
@@ -230,6 +238,12 @@ showTextCombo():void
 setupCardStack():void
 {
  this.cards=[];    
+ this.cardTicker.start();
+ //this.cardTicker.deltaTime
+ if(this.cardStack.children.length>0)
+ {
+   this.cardStack.removeChildren(0,this.cardStack.children.length);
+ }
  for(var i=0;i<144;i++)
   {
     var _rand=Math.floor((Math.random() * 6));    
@@ -241,7 +255,10 @@ setupCardStack():void
     this.cards.push(card);
    }   
  this.cardCounter=this.cards.length-1;
- this.app.ticker.add(delta => this.releaseCard(delta));
+ if(this.currentScreen==CARDMENU)
+ {
+   this.cardTicker.add(delta => this.releaseCard(delta),this);
+ }
 
 }
 
@@ -250,7 +267,8 @@ setupCardStack():void
   if(this.cardCounter>=0)
   {
    this.currentTime+=delta; 
-   if(this.currentTime>60)
+   //console.log(this.cardTicker.deltaTime);
+   if(this.currentTime>120)
      {              
         this.cards[this.cardCounter].x=this.stack2Pos_x+(this.cardCounter);
         this.cards[this.cardCounter].y=this.stack2Pos_y-(this.cardCounter);   
@@ -259,43 +277,78 @@ setupCardStack():void
         this.cardCounter-=1;
         this.currentTime=0.0;
      } 
-    }
-   /* else{
-      this.app.ticker.remove(this.releaseCard);
-    } 
-    */
+    }  
   }
 resetCardsMenu():void
 {
-  this.app.ticker.remove(this.releaseCard);
+  this.cardTicker.stop();
 }
 
   //text combo module
   setupTextCombo():void
-  {
-    this.banner=[];       
-    this.app.ticker.add(delta => this.displayMessage(delta));
-    
+  {   
+    this.comboTicker.start(); 
+    if(this.currentScreen==BANNERMENU)
+    {    
+    this.comboTicker.add(delta => this.displayMessage(delta),this.textCombo);    
+    }  
   }
 
   displayMessage(delta:number):void
   { this.currentTime+=delta; 
-    if(this.currentTime>120)
-      { console.log("here");
-      var basicText = new PIXI.Text('Basic text in pixi');
-      basicText.x = window.innerWidth*0.5;
-      basicText.y = window.innerHeight*0.5;
-      this.textCombo.addChild(basicText);
-      //basicText.text="here";
-      this.banner.push(basicText);
-        //console.log(this.banner.length);
-        this.currentTime=0.0;
+    if(this.currentTime>240)
+      { console.log("displaymesage"+this.currentTime);
+        this.resetBanner();
+         this.banner=[];  
+        for(var i=0;i<3;i++)
+        {
+          var _rand=Math.floor((Math.random() * 4)); 
+          var _randFontSize=Math.floor((Math.random()*30));  
+          
+          if(_rand==0)
+          {
+            var _randText=Math.floor((Math.random() * emotionStr.length));            
+            var emoText=  new PIXI.Text(emotionStr[_randText]);           
+            this.banner.push(emoText);
+      
+          } 
+          if(_rand==1)
+          {
+            var _randText=Math.floor((Math.random() * prices.length));     
+            var emoText=  new PIXI.Text(prices[_randText].toString());         
+            this.banner.push(emoText);
+          } 
+          if(_rand==2)
+          {
+          
+            var emospr=  new PIXI.Sprite(loader.resources[coinTexture].texture);           
+            this.banner.push(emospr);
+          } 
+          if(_rand==3)
+          {
+            var _randText=Math.floor((Math.random() * emotionTexture.length));     
+            var emospr= new PIXI.Sprite(loader.resources[emotionTexture[_randText]].texture);
+            this.banner.push(emospr);
+          } 
+         } 
+        
+         for(var i=0;i<this.banner.length;i++)
+         { console.log(this.banner.length);
+           this.textCombo.addChild(this.banner[i]);
+           this.banner[i].x=window.innerWidth*0.1*i;
+           this.banner[i].y=300;//window.innerHeight*0.25;
+         }
+         this.currentTime=0.0;  
+
      }
   }
   resetBanner():void
-  {
-    this.app.ticker.remove(this.displayMessage);
-    //console.log(this.banner.length);
+  {console.log(this.textCombo.children.length);
+    if(this.textCombo.children.length>0)
+    {
+      this.textCombo.removeChildren(0,this.textCombo.children.length);
+    }
+    
   }
 
 }
